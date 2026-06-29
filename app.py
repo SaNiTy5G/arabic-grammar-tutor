@@ -2,19 +2,20 @@ import streamlit as str
 import hashlib
 from openai import OpenAI
 
+# 1. PASTE YOUR ACTUAL OPENAI API KEY BETWEEN THE QUOTES BELOW
+# Example: MY_API_KEY = "sk-proj-..."
+MY_API_KEY = "YOUR_ACTUAL_OPENAI_API_KEY_HERE"
+
 # Page setup optimized for a premium mobile experience
 str.set_page_config(page_title="Anas AI - Live Voice", page_icon="🗣️", layout="centered")
 
-# --- CUSTOM PREMIUM CSS DESIGN ---
+# Custom Premium CSS Design
 str.markdown("""
     <style>
-    /* Main app background configuration */
     .stApp {
         background-color: #0d1117;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    
-    /* Title styling */
     h1 {
         color: #ffffff !important;
         font-weight: 800 !important;
@@ -22,16 +23,12 @@ str.markdown("""
         text-align: center;
         margin-bottom: 5px !important;
     }
-    
-    /* Subtext styling */
     .subtext {
         color: #8b949e;
         text-align: center;
         font-size: 14px;
         margin-bottom: 30px;
     }
-    
-    /* Custom clean container for the voice interface */
     .voice-card {
         background: linear-gradient(135deg, #161b22 0%, #21262d 100%);
         border: 1px solid #30363d;
@@ -40,8 +37,6 @@ str.markdown("""
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         margin-bottom: 20px;
     }
-    
-    /* Style custom labels */
     .custom-label {
         color: #58a6ff;
         font-weight: 600;
@@ -53,29 +48,22 @@ str.markdown("""
         align-items: center;
         gap: 8px;
     }
-    
-    /* Clean up the default Streamlit audio input container */
     div[data-testid="stAudioInput"] {
         background-color: #0d1117 !important;
         border: 1px solid #30363d !important;
         border-radius: 14px !important;
         padding: 10px !important;
     }
-    
-    /* Horizontal separator styling */
-    hr {
-        border-color: #21262d !important;
-        margin: 25px 0 !important;
+    /* This completely hides the sidebar navigation arrow on mobile */
+    button[data-testid="collapsedControl"] {
+        display: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- APP INTERFACE ---
-
 str.markdown("<h1>🗣️ Live Arabic Tutor</h1>", unsafe_allow_html=True)
 str.markdown("<p class='subtext'>Talk to Anas fluently. Your voice note will process, and he will respond out loud automatically.</p>", unsafe_allow_html=True)
 
-# Custom System Prompt for the Arabic Grammar Persona
 SYSTEM_PROMPT = """
 You are Anas, an expert, highly accurate (95%+ accuracy target) bilingual Arabic Grammar (Nahw) tutor and linguistic assistant. You speak, write, and explain concepts fluidly in both English and Arabic. Your tone is patient, encouraging, and deeply knowledgeable.
 
@@ -93,19 +81,13 @@ Interaction Rules:
 - Respond in the same language the user speaks to you. 
 """
 
-# Premium sidebar integration for the API key
-with str.sidebar:
-    str.markdown("<h3 style='color: white;'>Settings</h3>", unsafe_allow_html=True)
-    openai_api_key = str.text_input("Enter OpenAI API Key", type="password")
-    str.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
-
 # Initialize state structures
 if "messages" not in str.session_state:
     str.session_state.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 if "audio_responses" not in str.session_state:
     str.session_state.audio_responses = {}
 
-# Display previous messages using clean rendering layouts
+# Display previous messages
 for idx, message in enumerate(str.session_state.messages):
     if message["role"] != "system":
         with str.chat_message(message["role"]):
@@ -113,7 +95,7 @@ for idx, message in enumerate(str.session_state.messages):
             if message["role"] == "assistant" and idx in str.session_state.audio_responses:
                 str.audio(str.session_state.audio_responses[idx], format="audio/mp3", autoplay=False)
 
-# Wrapped Interface Card for Voice Controls
+# Main Interface Card
 str.markdown("<div class='voice-card'>", unsafe_allow_html=True)
 str.markdown("<div class='custom-label'>🎙️ Tap to Speak to Your Teacher</div>", unsafe_allow_html=True)
 
@@ -123,8 +105,8 @@ str.markdown("</div>", unsafe_allow_html=True)
 
 # Processing logic execution
 if audio_value:
-    if not openai_api_key:
-        str.info("Please add your OpenAI API key in the sidebar to begin your lesson.")
+    if MY_API_KEY == "YOUR_ACTUAL_OPENAI_API_KEY_HERE" or not MY_API_KEY:
+        str.error("Please add your secret OpenAI API key to line 7 of the code on GitHub.")
         str.stop()
 
     audio_bytes = audio_value.getvalue()
@@ -133,7 +115,7 @@ if audio_value:
     if "last_processed_hash" not in str.session_state or str.session_state.last_processed_hash != audio_hash:
         str.session_state.last_processed_hash = audio_hash
         
-        client = OpenAI(api_key=openai_api_key)
+        client = OpenAI(api_key=MY_API_KEY)
         
         with str.spinner("Listening..."):
             transcript = client.audio.transcriptions.create(
