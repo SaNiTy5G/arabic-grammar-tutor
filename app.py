@@ -2,9 +2,8 @@ import streamlit as str
 import hashlib
 from openai import OpenAI
 
-# 1. PASTE YOUR ACTUAL OPENAI API KEY BETWEEN THE QUOTES BELOW
-# Example: MY_API_KEY = "sk-proj-..."
-MY_API_KEY = "YOUR_ACTUAL_OPENAI_API_KEY_HERE"
+# Your OpenAI API Key embedded directly into the application
+MY_API_KEY = "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"
 
 # Page setup optimized for a premium mobile experience
 str.set_page_config(page_title="Anas AI - Live Voice", page_icon="🗣️", layout="centered")
@@ -54,7 +53,7 @@ str.markdown("""
         border-radius: 14px !important;
         padding: 10px !important;
     }
-    /* This completely hides the sidebar navigation arrow on mobile */
+    /* Hides the default desktop sidebar navigation arrows on mobile screens */
     button[data-testid="collapsedControl"] {
         display: none !important;
     }
@@ -87,7 +86,7 @@ if "messages" not in str.session_state:
 if "audio_responses" not in str.session_state:
     str.session_state.audio_responses = {}
 
-# Display previous messages
+# Display previous messages safely without re-triggering audio autoplay loops
 for idx, message in enumerate(str.session_state.messages):
     if message["role"] != "system":
         with str.chat_message(message["role"]):
@@ -95,7 +94,7 @@ for idx, message in enumerate(str.session_state.messages):
             if message["role"] == "assistant" and idx in str.session_state.audio_responses:
                 str.audio(str.session_state.audio_responses[idx], format="audio/mp3", autoplay=False)
 
-# Main Interface Card
+# Main Premium Interface Card Container
 str.markdown("<div class='voice-card'>", unsafe_allow_html=True)
 str.markdown("<div class='custom-label'>🎙️ Tap to Speak to Your Teacher</div>", unsafe_allow_html=True)
 
@@ -103,12 +102,8 @@ audio_value = str.audio_input("Record Voice Note")
 
 str.markdown("</div>", unsafe_allow_html=True)
 
-# Processing logic execution
+# Processing audio pipelines if recording exists
 if audio_value:
-    if MY_API_KEY == "YOUR_ACTUAL_OPENAI_API_KEY_HERE" or not MY_API_KEY:
-        str.error("Please add your secret OpenAI API key to line 7 of the code on GitHub.")
-        str.stop()
-
     audio_bytes = audio_value.getvalue()
     audio_hash = hashlib.md5(audio_bytes).hexdigest()
 
